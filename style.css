@@ -1,0 +1,26 @@
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;font-family:Arial,sans-serif}
+canvas{display:block;width:100%;height:100%;background:#15171d;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:40px 40px}
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#252a35,#07080b 70%);color:#fff;z-index:20}
+.panel{width:min(560px,92vw);max-height:90vh;padding:28px;border:1px solid #3b4250;border-radius:18px;background:rgba(10,12,17,.94);box-shadow:0 20px 70px rgba(0,0,0,.6)}
+h1{margin:0;text-align:center;font-size:64px;letter-spacing:3px;text-shadow:0 0 22px rgba(52,152,219,.5)}
+.sub{text-align:center;color:#6fc8ff;font-weight:bold;letter-spacing:5px;margin:0 0 25px}
+input{width:100%;padding:13px 15px;border:1px solid #444b58;border-radius:9px;background:#171a21;color:white;font-size:16px;outline:none}
+.actions{display:flex;gap:10px;margin:12px 0}
+button{border:0;border-radius:9px;padding:13px 16px;background:#3498db;color:white;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+#refresh{background:#303642}
+.roomsHead{display:flex;justify-content:space-between;color:#aaa;font-size:13px;margin:16px 3px 7px}
+.rooms{max-height:310px;overflow:auto}
+.room{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:12px;margin:7px 0;border:1px solid #303641;border-radius:10px;background:#151820}
+.roomName{font-weight:bold}.roomMeta{color:#aeb5c1;font-size:13px}
+.join{padding:8px 12px;background:#2ecc71}
+.empty{padding:25px;text-align:center;color:#777}
+.status{min-height:20px;color:#ffcc66;font-size:13px;text-align:center}
+#hud,#roomInfo,#help{position:fixed;z-index:5;color:white;background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:10px 13px}
+#hud{top:14px;left:14px;font-weight:bold}
+#roomInfo{top:14px;right:14px}
+#roomInfo button{padding:5px 9px;margin-left:8px;background:#c0392b}
+#help{bottom:14px;left:50%;transform:translateX(-50%);font-size:13px;color:#ddd}
+.nameTag{position:absolute;color:white;font-size:12px;pointer-events:none}
+@media(max-width:600px){h1{font-size:48px}.actions{flex-direction:column}.panel{padding:20px}.rooms{max-height:240px}}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arena.io Online</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="lobby" class="screen">
+  <div class="panel">
+    <h1>Arena.io</h1>
+    <p class="sub">MULTIPLAYER ONLINE</p>
+
+    <div id="nameRow">
+      <input id="name" maxlength="16" placeholder="Seu nome" value="Jogador">
+    </div>
+
+    <div class="actions">
+      <button id="create">CRIAR SALA</button>
+      <button id="refresh">ATUALIZAR SALAS</button>
+    </div>
+
+    <div class="roomsHead">
+      <span>Salas disponíveis</span>
+      <span>👥 / 📶</span>
+    </div>
+    <div id="rooms" class="rooms">
+      <div class="empty">Carregando salas...</div>
+    </div>
+
+    <p id="status" class="status"></p>
+  </div>
+</div>
+
+<div id="gameUI" hidden>
+  <div id="hud">
+    🏆 <span id="score">0</span>
+    &nbsp; ❤️ <span id="hp">100</span>
+    &nbsp; 👥 <span id="online">1</span>
+    &nbsp; 📶 <span id="ping">--</span> ms
+  </div>
+  <div id="roomInfo">Sala: <b id="roomCode">----</b> <button id="leave">SAIR</button></div>
+  <div id="help">WASD / Setas = mover • Mouse = mirar • Clique = atirar</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
