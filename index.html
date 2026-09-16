@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Arena.io</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111;
+    font-family: Arial, sans-serif;
+    touch-action: none;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    background-color: #171717;
+    background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* HUD */
+
+#hud {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 12px 16px;
+    background: rgba(0,0,0,.72);
+    color: white;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 16px;
+    z-index: 10;
+    user-select: none;
+}
+
+#botCounter {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    padding: 12px 16px;
+    background: rgba(0,0,0,.72);
+    color: white;
+    border-radius: 12px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+#coinsHUD {
+    position: fixed;
+    top: 100px;
+    right: 15px;
+    padding: 10px 15px;
+    background: rgba(0,0,0,.72);
+    color: #ffd700;
+    border-radius: 12px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+/* MENU */
+
+#menu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background:
+        radial-gradient(circle at center, #26384a, #080b0f);
+    color: white;
+    text-align: center;
+}
+
+#menu h1 {
+    margin: 0;
+    font-size: 70px;
+    letter-spacing: 5px;
+    text-shadow: 0 0 20px rgba(52,152,219,.8);
+}
+
+#menu p {
+    color: #bbb;
+    font-size: 17px;
+    margin: 10px 0 25px;
+}
+
+.menuButton {
+    border: 0;
+    padding: 14px 45px;
+    margin: 6px;
+    border-radius: 10px;
+    background: #3498db;
+    color: white;
+    font-size: 19px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.menuButton:hover {
+    transform: scale(1.04);
+}
+
+#shopButton {
+    background: #8e44ad;
+}
+
+#shop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(5,8,12,.96);
+    color: white;
+    padding: 25px;
+    text-align: center;
+    overflow-y: auto;
+}
+
+#shop h2 {
+    font-size: 38px;
+    margin: 10px;
+}
+
+#shopCoins {
+    color: #ffd700;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.skin {
+    display: inline-block;
+    width: 150px;
+    margin: 10px;
+    padding: 15px;
+    background: #1d2730;
+    border-radius: 14px;
+}
+
+.skinPreview {
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    margin: auto auto 10px;
+    object-fit: cover;
+    display: block;
+    background: #333;
+}
+
+.skin button {
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* MOBILE */
+
+#mobileControls {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+}
+
+#joystick {
+    position: absolute;
+    left: 25px;
+    bottom: 25px;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    border: 2px solid rgba(255,255,255,.25);
+    pointer-events: auto;
+}
+
+#stick {
+    position: absolute;
+    left: 40px;
+    top: 40px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(52,152,219,.8);
+}
+
+#shootButton {
+    position: absolute;
+    right: 30px;
+    bottom: 35px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.4);
+    background: rgba(231,76,60,.75);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    pointer-events: auto;
+}
+
+#mobileAim {
+    position: absolute;
+    right: 155px;
+    bottom: 45px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    pointer-events: auto;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 700px) {
+
+    #menu h1 {
+        font-size: 48px;
+    }
+
+    #menu p {
+        font-size: 14px;
+        padding: 0 20px;
+    }
+
+    #hud {
+        font-size: 13px;
+        padding: 9px 11px;
+    }
+
+    #botCounter {
+        font-size: 13px;
+        padding: 9px 11px;
+    }
+
+    #coinsHUD {
+        top: 70px;
+        right: 15px;
+        font-size: 13px;
+        padding: 8px 11px;
+    }
+
+    #help {
+        display: none;
+    }
+
+    #mobileControls {
+        display: block;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="hud">
+🏆 Pontos: <span id="score">0</span><br>
+❤️ Vida: <span id="hp">100</span><br>
+🔥 Nível: <span id="level">1</span><br>
+🏅 Recorde: <span id="highScore">0</span>
+</div>
+
+<div id="botCounter">
+🤖 Bots: <span id="bots">0</span>
+</div>
+
+<div id="coinsHUD">
+🪙 <span id="coins">0</span>
+</div>
+
+<div id="help">
+WASD = mover • Mouse = mirar • Segure clique = atirar
+</div>
+
+<!-- MENU -->
+
+<div id="menu">
+
+    <h1 id="menuTitle">Arena.io</h1>
+
+    <p id="menuText">
+        Sobreviva aos bots e faça a maior pontuação!
+    </p>
+
+    <button class="menuButton" id="playButton">
+        JOGAR
+    </button>
+
+    <button class="menuButton" id="shopButton">
+        🎨 SKINS
+    </button>
+
+</div>
+
+<!-- LOJA -->
+
+<div id="shop">
+
+    <h2>🎨 Loja de Skins</h2>
+
+    <div id="shopCoins">
+        🪙 Moedas: <span id="shopCoinsValue">0</span>
+    </div>
+
+    <div id="skins"></div>
+
+    <button class="menuButton" id="closeShop">
+        VOLTAR
+    </button>
+
+</div>
+
+<!-- CONTROLES MOBILE -->
+
+<div id="mobileControls">
+
+    <div id="joystick">
+        <div id="stick"></div>
+    </div>
+
+    <div id="mobileAim"></div>
+
+    <button id="shootButton">
+        🔥
+    </button>
+
+</div>
+
+<script>
+
+/* =====================================================
+CANVAS
+===================================================== */
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+resize();
+
+window.addEventListener("resize", resize);
+
+
+/* =====================================================
+ÁUDIO
+===================================================== */
+
+let audioContext = null;
+
+function initAudio() {
+
+    if (!audioContext) {
+        audioContext =
+            new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+}
+
+function sound(frequency, duration, type = "square", volume = 0.04) {
+
+    if (!audioContext) return;
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = type;
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        audioContext.currentTime
+    );
+
+    gain.gain.setValueAtTime(
+        volume,
+        audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + duration
+    );
+}
+
+
+/* =====================================================
+SALVAMENTO
+===================================================== */
+
+let coins =
+    Number(localStorage.getItem("arenaCoins")) || 0;
+
+let highScore =
+    Number(localStorage.getItem("arenaHighScore")) || 0;
+
+let ownedSkins =
+    JSON.parse(localStorage.getItem("arenaSkins") || '["blue"]');
+
+if (!Array.isArray(ownedSkins) || !ownedSkins.includes("blue")) {
+    ownedSkins = ["blue"];
+}
+
+let selectedSkin =
+    localStorage.getItem("arenaSelectedSkin") || "blue";
+
+if (!ownedSkins.includes(selectedSkin)) {
+    selectedSkin = "blue";
+}
+
+
+function saveData() {
+
+    localStorage.setItem(
+        "arenaCoins",
+        coins
+    );
+
+    localStorage.setItem(
+        "arenaHighScore",
+        highScore
+    );
+
+    localStorage.setItem(
+        "arenaSkins",
+        JSON.stringify(ownedSkins)
+    );
+
+    localStorage.setItem(
+        "arenaSelectedSkin",
+        selectedSkin
+    );
+}
+
+
+/* =====================================================
+SKINS
+===================================================== */
+
+const skins = {
+
+    blue: {
+        name: "Azul",
+        color: "#3498db",
+        image: "",
+        price: 0
+    },
+
+    diamond: {
+        name: "💎 Diamante",
+        color: "#7de3ff",
+        image: "https://i.pinimg.com/564x/dd/f1/81/ddf1810db8bc21945ed3b9e1f7368571.jpg",
+        price: 200
+    },
+
+    gold: {
+        name: "🥇 Ouro",
+        color: "#f1c40f",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS75m5p-F7688OndKC0pKyfH4N17EYZEx0ENu6iMmYd4Q&s=10",
+        price: 500
+    },
+
+    emerald: {
+        name: "💚 Esmeralda",
+        color: "#2ecc71",
+        image: "https://i.pinimg.com/564x/fc/85/eb/fc85ebe33962ef1e6d0c9779513bbe07.jpg",
+        price: 1000
+    }
+
+};
+
+
+function renderShop() {
+
+    const container =
+        document.getElementById("skins");
+
+    container.innerHTML = "";
+
+    document.getElementById("shopCoinsValue")
+        .textContent = coins;
+
+    for (const id in skins) {
+
+        const skin = skins[id];
+
+        const box =
+            document.createElement("div");
+
+        box.className = "skin";
+
+        const preview =
+            document.createElement("img");
+
+        preview.className = "skinPreview";
+
+        if (skin.image) {
+            preview.src = skin.image;
+            preview.alt = skin.name;
+            preview.loading = "lazy";
+        } else {
+            preview.style.background = skin.color;
+        }
+
+        const name =
+            document.createElement("div");
+
+        name.textContent =
+            skin.name;
+
+        name.style.fontWeight =
+            "bold";
+
+        name.style.marginBottom =
+            "8px";
+
+        const price =
+            document.createElement("div");
+
+        price.textContent =
+            skin.price === 0
+                ? "Grátis"
+                : "🪙 " + skin.price;
+
+        price.style.marginBottom =
+            "8px";
+
+        const button =
+            document.createElement("button");
+
+        if (ownedSkins.includes(id)) {
+
+            if (selectedSkin === id) {
+
+                button.textContent =
+                    "EQUIPADA";
+
+            } else {
+
+                button.textContent =
+                    "EQUIPAR";
+
+                button.onclick = function() {
+
+                    selectedSkin = id;
+
+                    saveData();
+
+                    renderShop();
+
+                };
+            }
+
+        } else {
+
+            button.textContent =
+                "🪙 " + skin.price;
+
+            button.onclick = function() {
+
+                if (coins >= skin.price) {
+
+                    coins -= skin.price;
+
+                    ownedSkins.push(id);
+
+                    selectedSkin = id;
+
+                    saveData();
+
+                    renderShop();
+
+                    updateHUD();
+
+                    sound(
+                        800,
+                        0.15,
+                        "sine",
+                        0.05
+                    );
+
+                } else {
+
+                    sound(
+                        100,
+                        0.15,
+                        "sawtooth",
+                        0.05
+                    );
+
+                    alert("Você não tem moedas suficientes!");
+                }
+            };
+        }
+
+        box.appendChild(preview);
+        box.appendChild(name);
+        box.appendChild(price);
+        box.appendChild(button);
+
+        container.appendChild(box);
+    }
+}
+
+
+/* =====================================================
+CONTROLES
+===================================================== */
+
+const keys = {};
+
+window.addEventListener("keydown", event => {
+
+    keys[event.key.toLowerCase()] = true;
+
+});
+
+window.addEventListener("keyup", event => {
+
+    keys[event.key.toLowerCase()] = false;
+
+});
+
+
+/* =====================================================
+MOUSE
+===================================================== */
+
+const mouse = {
+
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    down: false
+
+};
+
+
+canvas.addEventListener("mousemove", event => {
+
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+
+});
+
+
+canvas.addEventListener("mousedown", () => {
+
+    mouse.down = true;
+
+    initAudio();
+
+});
+
+
+window.addEventListener("mouseup", () => {
+
+    mouse.down = false;
+
+});
+
+
+/* =====================================================
+MOBILE
+===================================================== */
+
+let mobileMoveX = 0;
+let mobileMoveY = 0;
+
+let mobileAimX =
+    canvas.width / 2;
+
+let mobileAimY =
+    canvas.height / 2;
+
+let mobileShooting = false;
+
+
+/* JOYSTICK */
+
+const joystick =
+    document.getElementById("joystick");
+
+const stick =
+    document.getElementById("stick");
+
+
+joystick.addEventListener("touchmove", event => {
+
+    event.preventDefault();
+
+    const touch =
+        event.touches[0];
+
+    const rect =
+        joystick.getBoundingClientRect();
+
+    let x =
+        touch.clientX -
+        (rect.left + rect.width / 2);
+
+    let y =
+        touch.clientY -
+        (rect.top + rect.height / 2);
+
+    const distance =
+        Math.hypot(x, y);
+
+    const max =
+        40;
+
+    if (distance > max) {
+
+        x =
+            x / distance * max;
+
+        y =
+            y / distance * max;
+    }
+
+    stick.style.left =
+        (40 + x) + "px";
+
+    stick.style.top =
+        (40 + y) + "px";
+
+    mobileMoveX =
+        x / max;
+
+    mobileMoveY =
+        y / max;
+
+}, { passive: false });
+
+
+joystick.addEventListener("touchend", () => {
+
+    mobileMoveX = 0;
+    mobileMoveY = 0;
+
+    stick.style.left = "40px";
+    stick.style.top = "40px";
+
+});
+
+
+/* MIRA MOBILE */
+
+const mobileAim =
+    document.getElementById("mobileAim");
+
+mobileAim.addEventListener("touchmove", event => {
+
+    event.preventDefault();
+
+    const touch =
+        event.touches[0];
+
+    mobileAimX =
+        touch.clientX;
+
+    mobileAimY =
+        touch.clientY;
+
+    mouse.x =
+        mobileAimX;
+
+    mouse.y =
+        mobileAimY;
+
+}, { passive: false });
+
+
+/* BOTÃO DE TIRO */
+
+const shootButton =
+    document.getElementById("shootButton");
+
+
+shootButton.addEventListener("touchstart", event => {
+
+    event.preventDefault();
+
+    mobileShooting = true;
+
+    mouse.down = true;
+
+    initAudio();
+
+});
+
+
+shootButton.addEventListener("touchend", event => {
+
+    event.preventDefault();
+
+    mobileShooting = false;
+
+    mouse.down = false;
+
+});
+
+
+/* =====================================================
+JOGADOR
+===================================================== */
+
+const player = {
+
+    x: canvas.width / 2,
+
+    y: canvas.height / 2,
+
+    radius: 20,
+
+    speed: 4,
+
+    hp: 100,
+
+    maxHp: 100,
+
+    cooldown: 0
+
+};
+
+
+/* =====================================================
+GAME STATE
+===================================================== */
+
+let playing = false;
+
+let score = 0;
+
+let level = 1;
+
+let botSpawnTimer = 0;
+
+
+/* =====================================================
+ARRAYS
+===================================================== */
+
+const playerBullets = [];
+
+const botBullets = [];
+
+const bots = [];
+
+const particles = [];
+
+const texts = [];
+
+
+/* =====================================================
+DISTÂNCIA
+===================================================== */
+
+function distance(a, b) {
+
+    return Math.hypot(
+        a.x - b.x,
+        a.y - b.y
+    );
+
+}
+
+
+/* =====================================================
+BOT
+===================================================== */
+
+function createBot() {
+
+    let x;
+    let y;
+
+    do {
+
+        x =
+            Math.random() *
+            (canvas.width - 80) + 40;
+
+        y =
+            Math.random() *
+            (canvas.height - 80) + 40;
+
+    } while (
+        Math.hypot(
+            x - player.x,
+            y - player.y
+        ) < 250
+    );
+
+    bots.push({
+
+        x,
+        y,
+
+        radius: 18,
+
+        speed:
+            0.6 +
+            Math.random() * 0.8,
+
+        angle:
+            Math.random() *
+            Math.PI * 2,
+
+        moveTimer:
+            30 +
+            Math.random() * 100,
+
+        shootTimer:
+            50 +
+            Math.random() * 130
+
+    });
+
+}
+
+
+function spawnBots() {
+
+    bots.length = 0;
+
+    const amount =
+        8 + level * 2;
+
+    for (
+        let i = 0;
+        i < amount;
+        i++
+    ) {
+
+        createBot();
+
+    }
+
+}
+
+
+/* =====================================================
+PARTÍCULAS
+===================================================== */
+
+function greenParticles(x, y) {
+
+    for (
+        let i = 0;
+        i < 20;
+        i++
+    ) {
+
+        const angle =
+            Math.random() *
+            Math.PI * 2;
+
+        const speed =
+            1 +
+            Math.random() * 4;
+
+        particles.push({
+
+            x,
+            y,
+
+            dx:
+                Math.cos(angle) *
+                speed,
+
+            dy:
+                Math.sin(angle) *
+                speed,
+
+            size:
+                2 +
+                Math.random() * 4,
+
+            life:
+                20 +
+                Math.random() * 25
+
+        });
+
+    }
+
+}
+
+
+function floatingText(x, y, text) {
+
+    texts.push({
+
+        x,
+        y,
+
+        text,
+
+        life: 45
+
+    });
+
+}
+
+
+/* =====================================================
+TIRO DO JOGADOR
+===================================================== */
+
+function playerShoot() {
+
+    if (player.cooldown > 0)
+        return;
+
+    const angle =
+        Math.atan2(
+            mouse.y - player.y,
+            mouse.x - player.x
+        );
+
+    playerBullets.push({
+
+        x:
+            player.x +
+            Math.cos(angle) * 25,
+
+        y:
+            player.y +
+            Math.sin(angle) * 25,
+
+        radius: 5,
+
+        speed: 10,
+
+        dx:
+            Math.cos(angle),
+
+        dy:
+            Math.sin(angle)
+
+    });
+
+    player.cooldown = 9;
+
+    sound(
+        650,
+        0.05,
+        "square",
+        0.035
+    );
+
+}
+
+
+/* =====================================================
+TIRO BOT
+===================================================== */
+
+function botShoot(bot) {
+
+    const angle =
+        Math.atan2(
+            player.y - bot.y,
+            player.x - bot.x
+        );
+
+    botBullets.push({
+
+        x: bot.x,
+
+        y: bot.y,
+
+        radius: 5,
+
+        speed: 4.5,
+
+        dx:
+            Math.cos(angle),
+
+        dy:
+            Math.sin(angle)
+
+    });
+
+}
+
+
+/* =====================================================
+JOGADOR
+===================================================== */
+
+function updatePlayer() {
+
+    let dx = 0;
+    let dy = 0;
+
+
+    if (keys["w"])
+        dy--;
+
+    if (keys["s"])
+        dy++;
+
+    if (keys["a"])
+        dx--;
+
+    if (keys["d"])
+        dx++;
+
+
+    dx += mobileMoveX;
+    dy += mobileMoveY;
+
+
+    if (dx !== 0 || dy !== 0) {
+
+        const length =
+            Math.hypot(dx, dy);
+
+        if (length > 1) {
+
+            dx /= length;
+            dy /= length;
+
+        }
+
+        player.x +=
+            dx * player.speed;
+
+        player.y +=
+            dy * player.speed;
+
+    }
+
+
+    player.x =
+        Math.max(
+            player.radius,
+            Math.min(
+                canvas.width -
+                player.radius,
+                player.x
+            )
+        );
+
+
+    player.y =
+        Math.max(
+            player.radius,
+            Math.min(
+                canvas.height -
+                player.radius,
+                player.y
+            )
+        );
+
+
+    if (player.cooldown > 0)
+        player.cooldown--;
+
+
+    if (mouse.down)
+        playerShoot();
+
+}
+
+
+/* =====================================================
+BOTS
+===================================================== */
+
+function updateBots() {
+
+    for (const bot of bots) {
+
+        bot.moveTimer--;
+
+        if (bot.moveTimer <= 0) {
+
+            bot.angle =
+                Math.random() *
+                Math.PI * 2;
+
+            bot.moveTimer =
+                40 +
+                Math.random() * 100;
+
+        }
+
+
+        bot.x +=
+            Math.cos(bot.angle) *
+            bot.speed;
+
+        bot.y +=
+            Math.sin(bot.angle) *
+            bot.speed;
+
+
+        if (
+            bot.x < bot.radius ||
+            bot.x >
+            canvas.width -
+            bot.radius
+        ) {
+
+            bot.angle =
+                Math.PI -
+                bot.angle;
+
+        }
+
+
+        if (
+            bot.y < bot.radius ||
+            bot.y >
+            canvas.height -
+            bot.radius
+        ) {
+
+            bot.angle =
+                -bot.angle;
+
+        }
+
+
+        bot.x =
+            Math.max(
+                bot.radius,
+                Math.min(
+                    canvas.width -
+                    bot.radius,
+                    bot.x
+                )
+            );
+
+
+        bot.y =
+            Math.max(
+                bot.radius,
+                Math.min(
+                    canvas.height -
+                    bot.radius,
+                    bot.y
+                )
+            );
+
+
+        bot.shootTimer--;
+
+
+        if (bot.shootTimer <= 0) {
+
+            botShoot(bot);
+
+            bot.shootTimer =
+                Math.max(
+                    35,
+                    120 - level * 5
+                ) +
+                Math.random() * 80;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+BALAS DO JOGADOR
+===================================================== */
+
+function updatePlayerBullets() {
+
+    for (
+        let i =
+            playerBullets.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const bullet =
+            playerBullets[i];
+
+
+        bullet.x +=
+            bullet.dx *
+            bullet.speed;
+
+        bullet.y +=
+            bullet.dy *
+            bullet.speed;
+
+
+        if (
+            bullet.x < 0 ||
+            bullet.x > canvas.width ||
+            bullet.y < 0 ||
+            bullet.y > canvas.height
+        ) {
+
+            playerBullets.splice(i, 1);
+
+            continue;
+
+        }
+
+
+        for (
+            let j =
+                bots.length - 1;
+            j >= 0;
+            j--
+        ) {
+
+            const bot =
+                bots[j];
+
+
+            if (
+                distance(
+                    bullet,
+                    bot
+                ) <
+                bullet.radius +
+                bot.radius
+            ) {
+
+                /* BOT MORRE */
+
+                greenParticles(
+                    bot.x,
+                    bot.y
+                );
+
+
+                floatingText(
+                    bot.x,
+                    bot.y,
+                    "+10  🪙+2"
+                );
+
+
+                /* =====================================
+                   AQUI ESTÁ A RECOMPENSA:
+                   CADA BOT = 2 MOEDAS
+                ===================================== */
+
+                coins += 2;
+
+
+                score += 10;
+
+
+                bots.splice(j, 1);
+
+                playerBullets.splice(i, 1);
+
+
+                sound(
+                    110,
+                    0.12,
+                    "sawtooth",
+                    0.06
+                );
+
+
+                /* NÍVEL */
+
+                const newLevel =
+                    Math.floor(
+                        score / 100
+                    ) + 1;
+
+
+                if (
+                    newLevel > level
+                ) {
+
+                    level =
+                        newLevel;
+
+                    sound(
+                        900,
+                        0.2,
+                        "sine",
+                        0.05
+                    );
+
+                }
+
+
+                saveData();
+
+                updateHUD();
+
+                break;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+BALAS DOS BOTS
+===================================================== */
+
+function updateBotBullets() {
+
+    for (
+        let i =
+            botBullets.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const bullet =
+            botBullets[i];
+
+
+        bullet.x +=
+            bullet.dx *
+            bullet.speed;
+
+        bullet.y +=
+            bullet.dy *
+            bullet.speed;
+
+
+        if (
+            bullet.x < 0 ||
+            bullet.x > canvas.width ||
+            bullet.y < 0 ||
+            bullet.y > canvas.height
+        ) {
+
+            botBullets.splice(i, 1);
+
+            continue;
+
+        }
+
+
+        if (
+            distance(
+                bullet,
+                player
+            ) <
+            bullet.radius +
+            player.radius
+        ) {
+
+            player.hp -= 10;
+
+            botBullets.splice(i, 1);
+
+            sound(
+                80,
+                0.15,
+                "sawtooth",
+                0.07
+            );
+
+
+            if (
+                player.hp <= 0
+            ) {
+
+                player.hp = 0;
+
+                endGame();
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+PARTÍCULAS
+===================================================== */
+
+function updateParticles() {
+
+    for (
+        let i =
+            particles.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const p =
+            particles[i];
+
+        p.x += p.dx;
+        p.y += p.dy;
+
+        p.dx *= 0.96;
+        p.dy *= 0.96;
+
+        p.life--;
+
+        if (p.life <= 0)
+            particles.splice(i, 1);
+
+    }
+
+}
+
+
+/* =====================================================
+TEXTOS
+===================================================== */
+
+function updateTexts() {
+
+    for (
+        let i =
+            texts.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const t =
+            texts[i];
+
+        t.y -= 0.7;
+
+        t.life--;
+
+        if (t.life <= 0)
+            texts.splice(i, 1);
+
+    }
+
+}
+
+
+/* =====================================================
+IMAGENS DAS SKINS
+===================================================== */
+
+const skinImages = {};
+
+for (const id in skins) {
+    if (skins[id].image) {
+        const img = new Image();
+        img.src = skins[id].image;
+        skinImages[id] = img;
+    }
+}
+
+
+/* =====================================================
+DESENHAR PLAYER
+===================================================== */
+
+function drawPlayer() {
+
+    const angle =
+        Math.atan2(
+            mouse.y - player.y,
+            mouse.x - player.x
+        );
+
+
+    ctx.save();
+
+    ctx.translate(
+        player.x,
+        player.y
+    );
+
+    ctx.rotate(angle);
+
+
+    /* SKIN */
+
+    const currentSkin = skins[selectedSkin];
+    const skinImage = skinImages[selectedSkin];
+
+    if (skinImage && skinImage.complete && skinImage.naturalWidth > 0) {
+
+        ctx.drawImage(
+            skinImage,
+            -player.radius,
+            -player.radius,
+            player.radius * 2,
+            player.radius * 2
+        );
+
+    } else {
+
+        ctx.fillStyle =
+            currentSkin.color;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            player.radius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+
+
+    /* ARMA */
+
+    ctx.fillStyle = "#222";
+
+    ctx.fillRect(
+        8,
+        -5,
+        30,
+        10
+    );
+
+
+    ctx.restore();
+
+
+    /* VIDA */
+
+    ctx.fillStyle = "#333";
+
+    ctx.fillRect(
+        player.x - 25,
+        player.y - 34,
+        50,
+        6
+    );
+
+
+    ctx.fillStyle = "#2ecc71";
+
+    ctx.fillRect(
+        player.x - 25,
+        player.y - 34,
+        50 *
+        (player.hp /
+        player.maxHp),
+        6
+    );
+
+}
+
+
+/* =====================================================
+BOTS
+===================================================== */
+
+function drawBots() {
+
+    for (const bot of bots) {
+
+        ctx.fillStyle =
+            "#e74c3c";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            bot.x,
+            bot.y,
+            bot.radius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "white";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            bot.x - 6,
+            bot.y - 4,
+            3,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.arc(
+            bot.x + 6,
+            bot.y - 4,
+            3,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+
+/* =====================================================
+BALAS
+===================================================== */
+
+function drawBullets() {
+
+    ctx.fillStyle =
+        "#f1c40f";
+
+    for (
+        const bullet
+        of playerBullets
+    ) {
+
+        ctx.beginPath();
+
+        ctx.arc(
+            bullet.x,
+            bullet.y,
+            bullet.radius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    ctx.fillStyle =
+        "#ff8c42";
+
+    for (
+        const bullet
+        of botBullets
+    ) {
+
+        ctx.beginPath();
+
+        ctx.arc(
+            bullet.x,
+            bullet.y,
+            bullet.radius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+
+/* =====================================================
+PARTÍCULAS
+===================================================== */
+
+function drawParticles() {
+
+    for (const p of particles) {
+
+        ctx.globalAlpha =
+            Math.max(
+                0,
+                p.life / 45
+            );
+
+        ctx.fillStyle =
+            "#39ff14";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+/* =====================================================
+TEXTOS
+===================================================== */
+
+function drawTexts() {
+
+    ctx.textAlign =
+        "center";
+
+    ctx.font =
+        "bold 18px Arial";
+
+
+    for (const t of texts) {
+
+        ctx.globalAlpha =
+            t.life / 45;
+
+        ctx.fillStyle =
+            "#39ff14";
+
+        ctx.fillText(
+            t.text,
+            t.x,
+            t.y
+        );
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+/* =====================================================
+MIRA
+===================================================== */
+
+function drawCrosshair() {
+
+    /* No celular a mira fica escondida */
+
+    if (
+        "ontouchstart" in window
+    )
+        return;
+
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.8)";
+
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        mouse.x - 10,
+        mouse.y
+    );
+
+    ctx.lineTo(
+        mouse.x + 10,
+        mouse.y
+    );
+
+    ctx.moveTo(
+        mouse.x,
+        mouse.y - 10
+    );
+
+    ctx.lineTo(
+        mouse.x,
+        mouse.y + 10
+    );
+
+    ctx.stroke();
+
+}
+
+
+/* =====================================================
+HUD
+===================================================== */
+
+function updateHUD() {
+
+    document.getElementById(
+        "score"
+    ).textContent = score;
+
+    document.getElementById(
+        "hp"
+    ).textContent = player.hp;
+
+    document.getElementById(
+        "level"
+    ).textContent = level;
+
+    document.getElementById(
+        "bots"
+    ).textContent = bots.length;
+
+    document.getElementById(
+        "coins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "highScore"
+    ).textContent = highScore;
+
+}
+
+
+/* =====================================================
+GAME OVER
+===================================================== */
+
+function endGame() {
+
+    playing = false;
+
+    mouse.down = false;
+
+    mobileShooting = false;
+
+
+    /*
+       NOVO HIGH SCORE
+    */
+
+    let newRecord = false;
+
+
+    if (
+        score > highScore
+    ) {
+
+        highScore = score;
+
+        /*
+           NOVO RECORD = +100 MOEDAS
+        */
+
+        coins += 100;
+
+        newRecord = true;
+
+        saveData();
+
+        sound(
+            1000,
+            0.3,
+            "sine",
+            0.08
+        );
+
+    }
+
+
+    const title =
+        document.getElementById(
+            "menuTitle"
+        );
+
+    const text =
+        document.getElementById(
+            "menuText"
+        );
+
+    const button =
+        document.getElementById(
+            "playButton"
+        );
+
+
+    title.textContent =
+        newRecord
+        ? "🏆 NOVO RECORD!"
+        : "GAME OVER";
+
+
+    text.textContent =
+        newRecord
+        ? "Você fez " +
+          score +
+          " pontos e ganhou 100 moedas!"
+        : "Você fez " +
+          score +
+          " pontos";
+
+
+    button.textContent =
+        "JOGAR NOVAMENTE";
+
+
+    document.getElementById(
+        "menu"
+    ).style.display = "flex";
+
+
+    updateHUD();
+
+}
+
+
+/* =====================================================
+COMEÇAR
+===================================================== */
+
+function startGame() {
+
+    initAudio();
+
+    playing = true;
+
+    score = 0;
+
+    level = 1;
+
+    player.x =
+        canvas.width / 2;
+
+    player.y =
+        canvas.height / 2;
+
+    player.hp =
+        player.maxHp;
+
+    player.cooldown = 0;
+
+    playerBullets.length = 0;
+
+    botBullets.length = 0;
+
+    particles.length = 0;
+
+    texts.length = 0;
+
+    spawnBots();
+
+    document.getElementById(
+        "menu"
+    ).style.display = "none";
+
+    updateHUD();
+
+}
+
+
+/* =====================================================
+RESPAWN DOS BOTS
+===================================================== */
+
+function manageBots() {
+
+    if (!playing)
+        return;
+
+
+    const wanted =
+        8 + level * 2;
+
+
+    if (
+        bots.length < wanted
+    ) {
+
+        botSpawnTimer--;
+
+
+        if (
+            botSpawnTimer <= 0
+        ) {
+
+            createBot();
+
+            botSpawnTimer = 30;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+LOOP
+===================================================== */
+
+function gameLoop() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    if (playing) {
+
+        updatePlayer();
+
+        updateBots();
+
+        updatePlayerBullets();
+
+        updateBotBullets();
+
+        updateParticles();
+
+        updateTexts();
+
+        manageBots();
+
+        drawBots();
+
+        drawBullets();
+
+        drawParticles();
+
+        drawTexts();
+
+        drawPlayer();
+
+        drawCrosshair();
+
+        updateHUD();
+
+    }
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* =====================================================
+BOTÕES
+===================================================== */
+
+document.getElementById(
+    "playButton"
+).addEventListener(
+    "click",
+    startGame
+);
+
+
+document.getElementById(
+    "shopButton"
+).addEventListener(
+    "click",
+    () => {
+
+        renderShop();
+
+        document.getElementById(
+            "shop"
+        ).style.display = "block";
+
+    }
+);
+
+
+document.getElementById(
+    "closeShop"
+).addEventListener(
+    "click",
+    () => {
+
+        document.getElementById(
+            "shop"
+        ).style.display = "none";
+
+    }
+);
+
+
+/* =====================================================
+INICIAR
+===================================================== */
+
+updateHUD();
+
+renderShop();
+
+gameLoop();
+
+</script>
+
+</body>
+</html>
